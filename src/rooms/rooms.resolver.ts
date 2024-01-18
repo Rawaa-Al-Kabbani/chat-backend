@@ -31,7 +31,7 @@ export class RoomsResolver {
     return this.roomsService.updateRoom(id, name);
   }
 
-  @Mutation(() => Room, { name: 'deleteRoom' })
+  @Mutation(() => Room, { name: 'removeRoom' })
   removeRoom(@Args('id', { type: () => Int }) id: number) {
     return this.roomsService.removeRoom(id);
   }
