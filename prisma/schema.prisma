@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Room {
-  id Int       @id @default(autoincrement())
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String
   messages   Message[] // Represent the one-to-many relationship
 }
@@ -22,6 +22,6 @@ model Message {
   text String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  room_id Int
+  room_id String @db.Uuid
   room    Room    @relation(fields: [room_id], references: [id])
 }

@@ -1,9 +1,9 @@
-import { InputType, Field, Int } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
 export class CreateMessageInput {
-  @Field(() => Int)
-  room_id: number;
+  @Field(() => String)
+  room_id: string;
 
   @Field({ nullable: false })
   user_name: string;

@@ -2,8 +2,8 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
 export class Room {
-  @Field(() => Int)
-  id: number;
+  @Field(() => String)
+  id: string;
 
   @Field(() => String)
   name: string;
@@ -29,6 +29,6 @@ export class Message {
   @Field(() => Date)
   updated_at: Date;
 
-  @Field(() => Int)
-  room_id: number;
+  @Field({ nullable: false })
+  room_id: string;
 }

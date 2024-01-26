@@ -17,6 +17,7 @@ export class RoomsService {
   }
   
   async createRoom(data: CreateRoomInput): Promise<Room> {
+    console.log("HEllo", data);
     return this.prisma.room.create({
       data,
     });
@@ -30,7 +31,7 @@ export class RoomsService {
     });
   }
 
-  async findRoom(id: number): Promise<Room> {
+  async findRoom(id: string): Promise<Room> {
     try {
       const selectedRoom = await this.prisma.room.findUnique({
         where: {
@@ -53,7 +54,7 @@ export class RoomsService {
     }
   }
 
-  async updateRoom(id: number, name: string) {
+  async updateRoom(id: string, name: string) {
     try {
       const updatedRoom = this.prisma.room.update({
         where: {
@@ -73,7 +74,7 @@ export class RoomsService {
     }
   }
 
-  async removeRoom(id: number): Promise<Room> {
+  async removeRoom(id: string): Promise<Room> {
     return this.prisma.room.delete({
       where: {
         id: id,
@@ -86,7 +87,7 @@ export class RoomsService {
       data,
     });
 
-    this.emitGatewayMessage(result.room_id.toString());
+    this.emitGatewayMessage(result.room_id);
     return result;
   }
 

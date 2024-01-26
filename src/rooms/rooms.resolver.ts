@@ -14,7 +14,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => Room, { name: 'room' })
-  findRoom(@Args('id', { type: () => Int }) id: number) {
+  findRoom(@Args('id', { type: () => String }) id: string) {
     return this.roomsService.findRoom(id);
   }
 
@@ -25,14 +25,14 @@ export class RoomsResolver {
 
   @Mutation(() => Room, { name: 'updateRoom' })
   updateRoom(
-    @Args('id', { type: () => Int }) id: number,
+    @Args('id', { type: () => String }) id: string,
     @Args('name', { type: () => String }) name: string,
   ) {
     return this.roomsService.updateRoom(id, name);
   }
 
   @Mutation(() => Room, { name: 'removeRoom' })
-  removeRoom(@Args('id', { type: () => Int }) id: number) {
+  removeRoom(@Args('id', { type: () => String }) id: string) {
     return this.roomsService.removeRoom(id);
   }
 
