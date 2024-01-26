@@ -1,14 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Room } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
+import { MyGateway } from 'src/gateway/gatway';
 import { CreateMessageInput } from './dto/create-message.input';
 import { CreateRoomInput } from './dto/create-room.input';
 import { Message } from './entities/room.entity';
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly gateway: MyGateway) {}
 
+  async emitGatewayMessage (roomId: string) {
+    return this.gateway.server.emit(roomId, {
+      content: "Update room chat"
+    });
+  }
+  
   async createRoom(data: CreateRoomInput): Promise<Room> {
     return this.prisma.room.create({
       data,
@@ -30,7 +37,11 @@ export class RoomsService {
           id: id,
         },
         include: {
-          messages: true,
+          messages: {
+            orderBy: {
+              created_at: 'asc',
+            }
+          },
         },
       });
       if (!selectedRoom) {
@@ -71,9 +82,12 @@ export class RoomsService {
   }
 
   async createMessage(data: CreateMessageInput): Promise<Message> {
-    return this.prisma.message.create({
+    const result = await this.prisma.message.create({
       data,
     });
+
+    this.emitGatewayMessage(result.room_id.toString());
+    return result;
   }
 
   async editMessage(id: number, data: CreateMessageInput) {
@@ -87,6 +101,7 @@ export class RoomsService {
       if (!editedMessage) {
         throw new NotFoundException(`Message with id ${id} not found`);
       }
+      this.emitGatewayMessage(data.room_id.toString());
       return editedMessage;
     } catch (error) {
       throw new NotFoundException(error.message);
@@ -94,10 +109,12 @@ export class RoomsService {
   }
 
   async deleteMessage(id: number): Promise<Message> {
-    return this.prisma.message.delete({
+    const result = await this.prisma.message.delete({
       where: {
         id: id,
       },
     });
+    this.emitGatewayMessage(result.room_id.toString());
+    return result;
   }
 }

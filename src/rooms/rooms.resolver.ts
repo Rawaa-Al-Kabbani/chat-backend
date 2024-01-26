@@ -50,7 +50,9 @@ export class RoomsResolver {
   }
 
   @Mutation(() => Message, { name: 'deleteMessage' })
-  deleteMessage(@Args('id', { type: () => Int }) id: number) {
+  deleteMessage(
+    @Args('id', { type: () => Int }) id: number
+    ) {
     return this.roomsService.deleteMessage(id);
   }
 }
