@@ -11,7 +11,6 @@ import { RoomsModule } from './rooms/rooms.module';
 import { RoomsResolver } from './rooms/rooms.resolver';
 import { RoomsService } from './rooms/rooms.service';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({

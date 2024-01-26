@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateMessageInput } from './dto/create-message.input';
 import { CreateRoomInput } from './dto/create-room.input';
 import { Message, Room } from './entities/room.entity';
@@ -43,16 +43,14 @@ export class RoomsResolver {
 
   @Mutation(() => Message, { name: 'editMessage' })
   async editMessage(
-    @Args('id', { type: () => Int }) id: number,
+    @Args('id', { type: () => String }) id: string,
     @Args('input') createMessageInput: CreateMessageInput,
   ) {
     return this.roomsService.editMessage(id, createMessageInput);
   }
 
   @Mutation(() => Message, { name: 'deleteMessage' })
-  deleteMessage(
-    @Args('id', { type: () => Int }) id: number
-    ) {
+  deleteMessage(@Args('id', { type: () => String }) id: string) {
     return this.roomsService.deleteMessage(id);
   }
 }

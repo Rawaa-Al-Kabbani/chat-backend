@@ -8,16 +8,18 @@ import { Message } from './entities/room.entity';
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly prisma: PrismaService, private readonly gateway: MyGateway) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly gateway: MyGateway,
+  ) {}
 
-  async emitGatewayMessage (roomId: string) {
+  async emitGatewayMessage(roomId: string) {
     return this.gateway.server.emit(roomId, {
-      content: "Update room chat"
+      content: 'Update room chat',
     });
   }
-  
+
   async createRoom(data: CreateRoomInput): Promise<Room> {
-    console.log("HEllo", data);
     return this.prisma.room.create({
       data,
     });
@@ -41,7 +43,7 @@ export class RoomsService {
           messages: {
             orderBy: {
               created_at: 'asc',
-            }
+            },
           },
         },
       });
@@ -91,7 +93,7 @@ export class RoomsService {
     return result;
   }
 
-  async editMessage(id: number, data: CreateMessageInput) {
+  async editMessage(id: string, data: CreateMessageInput) {
     try {
       const editedMessage = await this.prisma.message.update({
         where: {
@@ -102,20 +104,20 @@ export class RoomsService {
       if (!editedMessage) {
         throw new NotFoundException(`Message with id ${id} not found`);
       }
-      this.emitGatewayMessage(data.room_id.toString());
+      this.emitGatewayMessage(data.room_id);
       return editedMessage;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
   }
 
-  async deleteMessage(id: number): Promise<Message> {
+  async deleteMessage(id: string): Promise<Message> {
     const result = await this.prisma.message.delete({
       where: {
         id: id,
       },
     });
-    this.emitGatewayMessage(result.room_id.toString());
+    this.emitGatewayMessage(result.room_id);
     return result;
   }
 }
