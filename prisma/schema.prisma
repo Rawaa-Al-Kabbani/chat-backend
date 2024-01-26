@@ -11,17 +11,17 @@ datasource db {
 }
 
 model Room {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String
-  messages   Message[] // Represent the one-to-many relationship
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  messages Message[] // Represent the one-to-many relationship
 }
 
 model Message {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_name String
-  text String
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_name  String
+  text       String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  room_id String @db.Uuid
-  room    Room    @relation(fields: [room_id], references: [id])
+  room_id    String   @db.Uuid
+  room       Room     @relation(fields: [room_id], references: [id])
 }
