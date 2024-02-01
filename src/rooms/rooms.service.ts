@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Room } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { MyGateway } from 'src/gateway/gatway';
-import { CreateMessageInput } from './dto/create-message.input';
+import { MyGateway } from 'src/gateway/gateway';
 import { CreateRoomInput } from './dto/create-room.input';
-import { Message } from './entities/room.entity';
+import { Message, Room } from './entities/room.entity';
+import { CreateMessageInput } from './dto/create-message.input';
 
 @Injectable()
 export class RoomsService {
@@ -19,10 +18,16 @@ export class RoomsService {
     });
   }
 
-  async createRoom(data: CreateRoomInput): Promise<Room> {
-    return this.prisma.room.create({
-      data,
-    });
+  async createRoom(
+    data: CreateRoomInput,
+    userId: string | undefined,
+  ): Promise<Room | undefined> {
+    if (userId) {
+      return this.prisma.room.create({
+        data,
+      });
+    }
+    return;
   }
 
   findRooms(): Promise<Room[]> {
@@ -44,6 +49,9 @@ export class RoomsService {
             orderBy: {
               created_at: 'asc',
             },
+            include: {
+              user: true,
+            },
           },
         },
       });
@@ -57,6 +65,7 @@ export class RoomsService {
   }
 
   async updateRoom(id: string, name: string) {
+    // check if is logged in
     try {
       const updatedRoom = this.prisma.room.update({
         where: {
@@ -76,48 +85,75 @@ export class RoomsService {
     }
   }
 
-  async removeRoom(id: string): Promise<Room> {
-    return this.prisma.room.delete({
-      where: {
-        id: id,
-      },
-    });
-  }
-
-  async createMessage(data: CreateMessageInput): Promise<Message> {
-    const result = await this.prisma.message.create({
-      data,
-    });
-
-    this.emitGatewayMessage(result.room_id);
-    return result;
-  }
-
-  async editMessage(id: string, data: CreateMessageInput) {
-    try {
-      const editedMessage = await this.prisma.message.update({
+  async removeRoom(
+    id: string,
+    userId: string | undefined,
+  ): Promise<Room | undefined> {
+    if (userId) {
+      return this.prisma.room.delete({
         where: {
           id: id,
         },
-        data: data,
       });
-      if (!editedMessage) {
-        throw new NotFoundException(`Message with id ${id} not found`);
+    }
+    return;
+  }
+
+  async createMessage(
+    data: CreateMessageInput,
+    userId: string | undefined,
+  ): Promise<Message | undefined> {
+    console.log('userId', userId);
+    if (userId !== undefined) {
+      const result = await this.prisma.message.create({
+        data: {
+          ...data,
+          user_id: userId,
+        },
+      });
+      this.emitGatewayMessage(result.room_id);
+      return result;
+    }
+    return;
+  }
+
+  async editMessage(
+    id: string,
+    data: CreateMessageInput,
+    userId: string | undefined,
+  ) {
+    if (userId !== undefined) {
+      try {
+        const editedMessage = await this.prisma.message.update({
+          where: {
+            id: id,
+          },
+          data: data,
+        });
+        if (!editedMessage) {
+          throw new NotFoundException(`Message with id ${id} not found`);
+        }
+        this.emitGatewayMessage(data.room_id);
+        return editedMessage;
+      } catch (error) {
+        throw new NotFoundException(error.message);
       }
-      this.emitGatewayMessage(data.room_id);
-      return editedMessage;
-    } catch (error) {
-      throw new NotFoundException(error.message);
     }
   }
 
-  async deleteMessage(id: string): Promise<Message> {
-    const result = await this.prisma.message.delete({
-      where: {
-        id: id,
-      },
-    });
-    this.emitGatewayMessage(result.room_id);
-    return result;
+  async deleteMessage(
+    id: string,
+    userId: string | undefined,
+  ): Promise<Message | undefined> {
+    if (userId) {
+      const result = await this.prisma.message.delete({
+        where: {
+          id: id,
+        },
+      });
+      this.emitGatewayMessage(result.room_id);
+      return result;
+    }
+    return;
   }
 }

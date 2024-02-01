@@ -1,4 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
+import { User } from 'src/users/entities/user.entity';
 
 @ObjectType()
 export class Room {
@@ -18,7 +19,10 @@ export class Message {
   id: string;
 
   @Field({ nullable: false })
-  user_name: string;
+  user_id: string;
+
+  @Field(() => User, { nullable: true })
+  user?: User;
 
   @Field({ nullable: false })
   text: string;

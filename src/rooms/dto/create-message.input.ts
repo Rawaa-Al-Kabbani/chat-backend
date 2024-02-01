@@ -6,8 +6,5 @@ export class CreateMessageInput {
   room_id: string;
 
   @Field({ nullable: false })
-  user_name: string;
-
-  @Field({ nullable: false })
   text: string;
 }
