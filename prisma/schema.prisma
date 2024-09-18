@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+
+  created_by_id String @db.Uuid
+  created_by    User   @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Message {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  text String
+
+  user_id String @db.Uuid
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  room_id String @db.Uuid
+  room    Room   @relation(fields: [room_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model User {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username String @unique
+  password String
+
+  messages Message[]
+
+  rooms Room[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

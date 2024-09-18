@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=chat
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+
+  app:
+    depends_on:
+      - db
+    build: .
+    ports:
+      - 5000:5000
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/chat?schema=public
