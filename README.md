@@ -1,5 +1,5 @@
 # Chat app
-Chat app is an API for creating chat rooms and sending messages to other members of the room.
+Chat app is an API for creating chat rooms and sending messages to other members of the room via websockets.
 
 
 ## Pre-requirements
