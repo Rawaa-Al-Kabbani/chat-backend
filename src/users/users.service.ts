@@ -1,37 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from 'prisma/prisma.service';
-import { CreateUserInput } from './dto/create-user.input';
-import { AccessToken, User } from './entities/user.entity';
 import { GraphQLError } from 'graphql';
-import { SignInUserInput } from './dto/sign-in-user.input';
+import { PrismaService } from 'prisma/prisma.service';
+import { AuthService } from 'src/auth/auth.service';
+import { AccessToken } from 'src/auth/entities/acess-token.entity';
 import { ChangeUserPasswordInput } from './dto/change-user-password.input';
+import { CreateUserInput } from './dto/create-user.input';
+import { SignInUserInput } from './dto/sign-in-user.input';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prisma: PrismaService,
-    private jwtService: JwtService,
+    private prisma: PrismaService,
+    private authService: AuthService,
   ) {}
-
-  async getHashedPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
-  }
-
-  async getAccessToken({ id, username }: User): Promise<AccessToken> {
-    const payload = {
-      sub: id,
-      username: username,
-    };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-      user: {
-        id,
-        username,
-      },
-    };
-  }
 
   async createUser({
     username,
@@ -50,11 +33,11 @@ export class UsersService {
     const newUser = await this.prisma.user.create({
       data: {
         username,
-        password: await this.getHashedPassword(password),
+        password: await this.authService.hashPassword(password),
       },
     });
 
-    return this.getAccessToken(newUser);
+    return this.authService.generateAccessToken(newUser);
   }
 
   async signIn({ username, password }: SignInUserInput): Promise<AccessToken> {
@@ -73,7 +56,7 @@ export class UsersService {
       throw new GraphQLError('Invalid username or password');
     }
 
-    return this.getAccessToken(user);
+    return this.authService.generateAccessToken(user);
   }
 
   async changePassword(
@@ -103,7 +86,7 @@ export class UsersService {
         id: user.id,
       },
       data: {
-        password: await this.getHashedPassword(new_password),
+        password: await this.authService.hashPassword(new_password),
       },
     });
 

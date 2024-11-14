@@ -2,7 +2,6 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { User } from '@prisma/client';
 import { RequestUser } from 'src/decorators/request-user.decorator';
-import { AuthGuard } from '../users/users.guard';
 import { CreateMessageInput } from './dto/create-message.input';
 import { CreateRoomInput } from './dto/create-room.input';
 import { UpdateMessageInput } from './dto/update-message-input';
@@ -10,6 +9,7 @@ import { UpdateRoomInput } from './dto/update-room-input';
 import { Message } from './entities/message.entity';
 import { Room } from './entities/room.entity';
 import { RoomsService } from './rooms.service';
+import { AuthGuard } from 'src/auth/auth';
 
 @UseGuards(AuthGuard)
 @Resolver(() => Room)

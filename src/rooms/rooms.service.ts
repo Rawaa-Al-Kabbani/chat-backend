@@ -17,10 +17,22 @@ export class RoomsService {
     private readonly gateway: GatewayService,
   ) {}
 
+  async emitRoomEvent(event: string, payload: any) {
+    try {
+      this.gateway.server.emit(event, payload);
+    } catch (error) {
+      console.error(`Failed to emit room event (${event}):`, error);
+    }
+  }
+
   async emitGatewayMessage(roomId: string) {
-    return this.gateway.server.emit(roomId, {
-      content: 'Update room chat',
-    });
+    try {
+      this.gateway.server.emit(roomId, {
+        content: 'Update room chat',
+      });
+    } catch (error) {
+      console.error(`Failed to emit update for room ${roomId}:`, error);
+    }
   }
 
   async createRoom(data: CreateRoomInput, user: User): Promise<Room> {
@@ -33,7 +45,7 @@ export class RoomsService {
     if (room) {
       throw new GraphQLError(`A room with this name already exists`);
     }
-    return this.prisma.room.create({
+    const createdRoom = this.prisma.room.create({
       data: { ...data, created_by_id: user.id },
       include: {
         created_by: true,
@@ -44,6 +56,11 @@ export class RoomsService {
         },
       },
     });
+    if (!createdRoom) {
+      throw new GraphQLError(`Unable to update room`);
+    }
+    this.emitRoomEvent('roomCreated', createdRoom);
+    return createdRoom;
   }
 
   findRooms(): Promise<Room[]> {
@@ -110,6 +127,7 @@ export class RoomsService {
     if (!updatedRoom) {
       throw new GraphQLError(`Unable to update room`);
     }
+    this.emitRoomEvent('roomUpdated', updatedRoom);
     return updatedRoom;
   }
 
@@ -125,7 +143,7 @@ export class RoomsService {
       throw new GraphQLError(`The room does not exist`);
     }
 
-    return this.prisma.room.delete({
+    const deletedRoom = this.prisma.room.delete({
       where: {
         id,
       },
@@ -138,6 +156,12 @@ export class RoomsService {
         },
       },
     });
+    if (!deletedRoom) {
+      throw new GraphQLError(`Unable to update room`);
+    }
+    this.emitRoomEvent('roomDeleted', deletedRoom);
+
+    return deletedRoom;
   }
 
   async createMessage(data: CreateMessageInput, user: User): Promise<Message> {
@@ -200,7 +224,7 @@ export class RoomsService {
         user: true,
       },
     });
-    this.emitGatewayMessage(deletedMessage.room_id);
+    this.emitGatewayMessage(message.room_id);
     return deletedMessage;
   }
 }

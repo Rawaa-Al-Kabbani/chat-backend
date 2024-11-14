@@ -1,0 +1,13 @@
+
+port: 5000
+
+database:
+  url: "postgresql://postgres:postgres@localhost:5432/chat?schema=public"
+
+jwt:
+  expires: "180m"
+  secret: "secret"
+
+socket:
+  port: 5001
+  origin: "http://localhost:3000"

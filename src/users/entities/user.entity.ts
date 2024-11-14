@@ -8,12 +8,3 @@ export class User {
   @Field(() => String)
   username: string;
 }
-
-@ObjectType()
-export class AccessToken {
-  @Field(() => String)
-  access_token: string;
-
-  @Field(() => User)
-  user: User;
-}

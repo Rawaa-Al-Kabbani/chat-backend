@@ -12,12 +12,16 @@ import { RoomsService } from './rooms/rooms.service';
 import { UsersModule } from './users/users.module';
 import { UsersResolver } from './users/users.resolver';
 import { UsersService } from './users/users.service';
+import configuration from '../config/configuration';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      ignoreEnvFile: true,
+      load: [configuration],
       isGlobal: true,
-      envFilePath: ['.env'],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -28,6 +32,7 @@ import { UsersService } from './users/users.service';
     RoomsModule,
     GatewayModule,
     UsersModule,
+    AuthModule,
   ],
   providers: [
     RoomsService,
@@ -36,6 +41,7 @@ import { UsersService } from './users/users.service';
     UsersResolver,
     PrismaService,
     JwtService,
+    AuthService,
   ],
 })
 export class AppModule implements NestModule {
