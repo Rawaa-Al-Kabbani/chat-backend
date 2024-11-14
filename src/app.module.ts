@@ -5,8 +5,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import * as cors from 'cors';
 import { PrismaService } from 'prisma/prisma.service';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GatewayModule } from './gateway/gateway.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { RoomsResolver } from './rooms/rooms.resolver';
@@ -31,9 +29,7 @@ import { UsersService } from './users/users.service';
     GatewayModule,
     UsersModule,
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     RoomsService,
     RoomsResolver,
     UsersService,
