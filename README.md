@@ -8,9 +8,10 @@ Chat app is an API for creating chat rooms and sending messages to other members
 
 ## Running the app locally
 1) Start the database with `docker compose up db`
-2) Install dependencies with `yarn install`
-3) Start the dev server with `yarn run start:dev`
-4) The API will run on http://localhost:5000
+2) Migrate the database with `yarn run migrate:deploy`
+3) Install dependencies with `yarn install`
+4) Start the dev server with `yarn run start:dev`
+5) The API will run on http://localhost:5000
 
 
 ## Running the app with docker compose

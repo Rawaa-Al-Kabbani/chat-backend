@@ -1,9 +1,8 @@
 {
   "name": "chat",
   "version": "0.0.1",
-  "description": "",
+  "description": "The backend for the chat app",
   "author": "Rawaa",
-  "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
